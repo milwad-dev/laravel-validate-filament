@@ -1,20 +1,66 @@
 {
     "name": "milwad/laravel-validate-filament",
+    "description": "Filament field macros for the milwad/laravel-validate validation rules.",
+    "keywords": [
+        "milwad",
+        "laravel",
+        "filament",
+        "validation",
+        "laravel-validate",
+        "filament-plugin",
+        "framework",
+        "laravel validate package",
+        "laravel package",
+        "laravel-validation",
+        "validate",
+        "regex"
+    ],
+    "homepage": "https://github.com/milwad-dev/laravel-validate-filament",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Milwad Khosravi",
+            "email": "milwad.dev@gmail.com",
+            "homepage": "https://github.com/milwad-dev",
+            "role": "Author"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "filament/forms": "^3.0|^4.0|^5.0",
+        "milwad/laravel-validate": "^2.2"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+        "pestphp/pest": "^2.0|^3.0|^4.0"
+    },
     "autoload": {
         "psr-4": {
             "Milwad\\LaravelValidateFilament\\": "src/"
         }
     },
-    "authors": [
-        {
-            "name": "Milwad Khosravi",
-            "email": "milwad.dev@gmail.com",
-            "role": "Author",
-            "homepage": "https://github.com/milwad-dev"
+    "autoload-dev": {
+        "psr-4": {
+            "Milwad\\LaravelValidateFilament\\Tests\\": "tests/"
         }
-    ],
+    },
+    "scripts": {
+        "test": "vendor/bin/pest"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Milwad\\LaravelValidateFilament\\LaravelValidateFilamentServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "dev",
-    "require": {}
+    "prefer-stable": true
 }
