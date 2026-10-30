@@ -1,14 +1,12 @@
 # Laravel Validate Filament
 
-<img src="https://banners.beyondco.de/Laravel%20Validate%20Filament.png?theme=light&packageManager=composer+require&packageName=milwad%2Flaravel-validate-filament&pattern=bubbles&style=style_2&description=This+is+why+it%27s+awesome&md=1&showWatermark=0&fontSize=100px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg" alt="laravel-validate-filament-banner">
+<img src="https://banners.beyondco.de/Laravel%20Validate%20Filament.png?theme=light&packageManager=composer+require&packageName=milwad%2Flaravel-validate-filament&pattern=bubbles&style=style_2&description=Laravel-Validate+rules+as+fluent+Filament+field+methods&md=1&showWatermark=0&fontSize=100px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg" alt="laravel-validate-filament-banner">
 
 [![PHP Version Require](https://img.shields.io/packagist/dependency-v/milwad/laravel-validate-filament/php)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![Latest Stable Version](https://img.shields.io/packagist/v/milwad/laravel-validate-filament.svg?style=flat-square)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![Total Downloads](https://img.shields.io/packagist/dt/milwad/laravel-validate-filament.svg?style=flat-square)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![License](https://img.shields.io/packagist/l/milwad/laravel-validate-filament)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![Passed Tests](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/tests.yml/badge.svg)](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/tests.yml)
-[![Quality Score](https://img.shields.io/scrutinizer/g/milwad-dev/laravel-validate-filament.svg?style=flat-square)](https://scrutinizer-ci.com/g/milwad-dev/laravel-validate-filament)
-[![MadeWithLaravel.com shield](https://madewithlaravel.com/storage/repo-shields/4333-shield.svg)](https://madewithlaravel.com/p/laravel-validate-filament/shield-link)
 
 Use every rule from [milwad/laravel-validate](https://github.com/milwad-dev/laravel-validate) directly on your Filament form fields:
 
