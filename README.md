@@ -1,6 +1,6 @@
 # Laravel Validate Filament
 
-<img src="https://banners.beyondco.de/Laravel%20Validate%20Filament.png?theme=light&packageManager=composer+require&packageName=milwad%2Flaravel-validate-filament&pattern=bubbles&style=style_2&description=Laravel-Validate+rules+as+fluent+Filament+field+methods&md=1&showWatermark=0&fontSize=100px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg" alt="laravel-validate-filament-banner">
+<img src="https://banners.beyondco.de/Laravel%20Validate%20Filament.png?theme=dark&packageManager=composer+require&packageName=milwad%2Flaravel-validate-filament&pattern=bubbles&style=style_2&description=Laravel-Validate+rules+as+fluent+Filament+field+methods&md=1&showWatermark=0&fontSize=100px&images=https%3A%2F%2Flaravel.com%2Fimg%2Flogomark.min.svg" alt="laravel-validate-filament-banner">
 
 [![PHP Version Require](https://img.shields.io/packagist/dependency-v/milwad/laravel-validate-filament/php)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![Latest Stable Version](https://img.shields.io/packagist/v/milwad/laravel-validate-filament.svg?style=flat-square)](https://packagist.org/packages/milwad/laravel-validate-filament)
