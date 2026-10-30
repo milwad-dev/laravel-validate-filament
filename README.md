@@ -77,52 +77,52 @@ TextInput::make('phone')
 
 ## Available macros
 
-| Macro | Arguments | Rule |
-|-------|-----------|------|
-| `validBase64()` | | `ValidBase64` |
-| `validBitcoinAddress()` | | `ValidBitcoinAddress` |
-| `validCamelCase()` | | `ValidCamelCase` |
-| `validCapitalCharWithNumber()` | | `ValidCapitalCharWithNumber` |
-| `validCarNumber()` | | `ValidCarNumber` |
-| `validCartNumberIran()` | | `ValidCartNumberIran` |
-| `validCountry()` | `bool $validByKey = false` | `ValidCountry` |
-| `validCreditCard()` | | `ValidCreditCard` |
-| `validDiscordUsername()` | | `ValidDiscordUsername` |
-| `validDomain()` | | `ValidDomain` |
-| `validDuplicate()` | | `ValidDuplicate` |
-| `validDuplicateCharacter()` | | `ValidDuplicateCharacter` |
-| `validEvenNumber()` | | `ValidEvenNumber` |
-| `validHashtag()` | | `ValidHashtag` |
-| `validHexColor()` | | `ValidHexColor` |
-| `validHtmlTag()` | | `ValidHtmlTag` |
-| `validIban()` | `array\|string $countries = []` | `ValidIban` |
-| `validImei()` | | `ValidImei` |
-| `validIpAddressIPV4()` | | `ValidIpAddressIPV4` |
-| `validIpAddressIPV6()` | | `ValidIpAddressIPV6` |
-| `validIranPostalCode()` | | `ValidIranPostalCode` |
-| `validJalaliDate()` | `string $character = '/'` | `ValidJalaliDate` |
-| `validJwt()` | | `ValidJwt` |
-| `validKebabCase()` | | `ValidKebabCase` |
-| `validLandlineNumber()` | `?string $code = null` | `ValidLandlineNumber` |
-| `validLatitude()` | | `ValidLatitude` |
-| `validLongitude()` | | `ValidLongitude` |
-| `validNameDaysWeek()` | | `ValidNameDaysWeek` |
-| `validNationalCard()` | | `ValidNationalCard` |
-| `validNoHtml()` | `bool $strict = false` | `ValidNoHtml` |
-| `validOddNumber()` | | `ValidOddNumber` |
-| `validPascalCase()` | | `ValidPascalCase` |
-| `validPattern()` | `int $length, string $separator = '-'` | `ValidPattern` |
-| `validPhoneNumber()` | `?string $code = null` | `ValidPhoneNumber` |
-| `validPort()` | | `ValidPort` |
-| `validSlashEndOfString()` | | `ValidSlashEndOfString` |
-| `validSlug()` | | `ValidSlug` |
-| `validSnakeCase()` | | `ValidSnakeCase` |
-| `validStrongPassword()` | | `ValidStrongPassword` |
-| `validUlid()` | | `ValidUlid` |
-| `validUrl()` | | `ValidUrl` |
-| `validUsername()` | | `ValidUsername` |
-| `validUuid()` | | `ValidUuid` |
-| `validVatId()` | | `ValidVatId` |
+| Macro                          | Arguments                              | Rule                         |
+|--------------------------------|----------------------------------------|------------------------------|
+| `validBase64()`                |                                        | `ValidBase64`                |
+| `validBitcoinAddress()`        |                                        | `ValidBitcoinAddress`        |
+| `validCamelCase()`             |                                        | `ValidCamelCase`             |
+| `validCapitalCharWithNumber()` |                                        | `ValidCapitalCharWithNumber` |
+| `validCarNumber()`             |                                        | `ValidCarNumber`             |
+| `validCartNumberIran()`        |                                        | `ValidCartNumberIran`        |
+| `validCountry()`               | `bool $validByKey = false`             | `ValidCountry`               |
+| `validCreditCard()`            |                                        | `ValidCreditCard`            |
+| `validDiscordUsername()`       |                                        | `ValidDiscordUsername`       |
+| `validDomain()`                |                                        | `ValidDomain`                |
+| `validDuplicate()`             |                                        | `ValidDuplicate`             |
+| `validDuplicateCharacter()`    |                                        | `ValidDuplicateCharacter`    |
+| `validEvenNumber()`            |                                        | `ValidEvenNumber`            |
+| `validHashtag()`               |                                        | `ValidHashtag`               |
+| `validHexColor()`              |                                        | `ValidHexColor`              |
+| `validHtmlTag()`               |                                        | `ValidHtmlTag`               |
+| `validIban()`                  | `array\|string $countries = []`        | `ValidIban`                  |
+| `validImei()`                  |                                        | `ValidImei`                  |
+| `validIpAddressIPV4()`         |                                        | `ValidIpAddressIPV4`         |
+| `validIpAddressIPV6()`         |                                        | `ValidIpAddressIPV6`         |
+| `validIranPostalCode()`        |                                        | `ValidIranPostalCode`        |
+| `validJalaliDate()`            | `string $character = '/'`              | `ValidJalaliDate`            |
+| `validJwt()`                   |                                        | `ValidJwt`                   |
+| `validKebabCase()`             |                                        | `ValidKebabCase`             |
+| `validLandlineNumber()`        | `?string $code = null`                 | `ValidLandlineNumber`        |
+| `validLatitude()`              |                                        | `ValidLatitude`              |
+| `validLongitude()`             |                                        | `ValidLongitude`             |
+| `validNameDaysWeek()`          |                                        | `ValidNameDaysWeek`          |
+| `validNationalCard()`          |                                        | `ValidNationalCard`          |
+| `validNoHtml()`                | `bool $strict = false`                 | `ValidNoHtml`                |
+| `validOddNumber()`             |                                        | `ValidOddNumber`             |
+| `validPascalCase()`            |                                        | `ValidPascalCase`            |
+| `validPattern()`               | `int $length, string $separator = '-'` | `ValidPattern`               |
+| `validPhoneNumber()`           | `?string $code = null`                 | `ValidPhoneNumber`           |
+| `validPort()`                  |                                        | `ValidPort`                  |
+| `validSlashEndOfString()`      |                                        | `ValidSlashEndOfString`      |
+| `validSlug()`                  |                                        | `ValidSlug`                  |
+| `validSnakeCase()`             |                                        | `ValidSnakeCase`             |
+| `validStrongPassword()`        |                                        | `ValidStrongPassword`        |
+| `validUlid()`                  |                                        | `ValidUlid`                  |
+| `validUrl()`                   |                                        | `ValidUrl`                   |
+| `validUsername()`              |                                        | `ValidUsername`              |
+| `validUuid()`                  |                                        | `ValidUuid`                  |
+| `validVatId()`                 |                                        | `ValidVatId`                 |
 
 Every macro also takes `bool|Closure $condition = true` as its last argument. Country codes are available as constants on `Milwad\LaravelValidate\Utils\Country`. For details on each rule, see the [laravel-validate docs](https://github.com/milwad-dev/laravel-validate).
 
