@@ -1,0 +1,20 @@
+{
+    "name": "milwad/laravel-validate-filament",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Milwad\\LaravelValidateFilament\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Milwad Khosravi",
+            "email": "milwad.dev@gmail.com",
+            "role": "Author",
+            "homepage": "https://github.com/milwad-dev"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
