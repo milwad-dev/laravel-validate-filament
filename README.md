@@ -6,9 +6,8 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/milwad/laravel-validate-filament.svg?style=flat-square)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![Total Downloads](https://img.shields.io/packagist/dt/milwad/laravel-validate-filament.svg?style=flat-square)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![License](https://img.shields.io/packagist/l/milwad/laravel-validate-filament)](https://packagist.org/packages/milwad/laravel-validate-filament)
-[![Passed Tests](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/run-tests.yml/badge.svg)](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/run-tests.yml)
+[![Passed Tests](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/tests.yml/badge.svg)](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/tests.yml)
 [![Quality Score](https://img.shields.io/scrutinizer/g/milwad-dev/laravel-validate-filament.svg?style=flat-square)](https://scrutinizer-ci.com/g/milwad-dev/laravel-validate-filament)
-[![Check Imports](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/imports.yml/badge.svg?branch=1.x)](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/imports.yml)
 [![MadeWithLaravel.com shield](https://madewithlaravel.com/storage/repo-shields/4333-shield.svg)](https://madewithlaravel.com/p/laravel-validate-filament/shield-link)
 
 Use every rule from [milwad/laravel-validate](https://github.com/milwad-dev/laravel-validate) directly on your Filament form fields:
