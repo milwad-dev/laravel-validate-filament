@@ -117,6 +117,16 @@ TextInput::make('phone')
 
 Every macro also takes `bool|Closure $condition = true` as its last argument. Country codes are available as constants on `Milwad\LaravelValidate\Utils\Country`. For details on each rule, see the [laravel-validate docs](https://github.com/milwad-dev/laravel-validate).
 
+## Roadmap
+
+v1 ships field macros only. Planned for next versions:
+
+- [ ] Ready-made field components for the most common rules, e.g. `PhoneNumberInput::make('phone')`, `IbanInput::make('iban')`, `NationalCardInput::make('national_card')`, `StrongPasswordInput::make('password')`, each with the rule applied plus sensible defaults (mask, placeholder, prefix icon, input mode).
+- [ ] Translated error messages out of the box, without having to publish the `milwad/laravel-validate` language files.
+- [ ] IDE autocompletion for the macros (stub file with `@method` annotations, or a `php artisan laravel-validate-filament:ide-helper` command).
+- [ ] Optional table column / infolist helpers (e.g. masked IBAN / card number display).
+- [ ] Keep the macro list in sync when `milwad/laravel-validate` adds new rules.
+
 ## Testing
 
 ```bash
