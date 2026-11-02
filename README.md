@@ -8,7 +8,9 @@
 [![License](https://img.shields.io/packagist/l/milwad/laravel-validate-filament)](https://packagist.org/packages/milwad/laravel-validate-filament)
 [![Passed Tests](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/tests.yml/badge.svg)](https://github.com/milwad-dev/laravel-validate-filament/actions/workflows/tests.yml)
 
-Use every rule from [milwad/laravel-validate](https://github.com/milwad-dev/laravel-validate) directly on your Filament form fields:
+> **40+ `laravel-validate` rules as fluent, chainable Filament field methods — no custom `Rule` objects, no `rule()` boilerplate.**
+
+`laravel-validate-filament` registers a macro for every rule in [milwad/laravel-validate](https://github.com/milwad-dev/laravel-validate) on Filament's base `Field`, so you can validate phone numbers, IBANs, national cards, strong passwords, slugs, hex colors and more by chaining a single method — the same way you already chain `->required()` or `->email()`:
 
 ```php
 use Filament\Forms\Components\TextInput;
@@ -19,6 +21,35 @@ TextInput::make('iban')->validIban([Country::IRAN, Country::GERMANY]),
 TextInput::make('color')->validHexColor(),
 TextInput::make('slug')->validSlug(),
 ```
+
+Without this package you would wire each rule up by hand on every field:
+
+```php
+// Before
+use Milwad\LaravelValidate\Rules\ValidPhoneNumber;
+
+TextInput::make('phone')->rule(new ValidPhoneNumber(Country::IRAN)),
+
+// After
+TextInput::make('phone')->validPhoneNumber(Country::IRAN),
+```
+
+## Contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Validation messages](#validation-messages)
+- [Usage](#usage)
+  - [A complete form](#a-complete-form)
+  - [Conditional rules](#conditional-rules)
+  - [Dynamic arguments](#dynamic-arguments)
+  - [Custom error messages](#custom-error-messages)
+- [Available macros](#available-macros)
+- [How it works](#how-it-works)
+- [Troubleshooting](#troubleshooting)
+- [Roadmap](#roadmap)
+- [Testing](#testing)
+- [License](#license)
 
 ## Requirements
 
@@ -48,7 +79,43 @@ Replace `en` with your language. See the [supported languages](https://github.co
 
 ## Usage
 
-Every macro is named after its rule class (`ValidPhoneNumber` → `validPhoneNumber()`). The `valid` prefix keeps them from clashing with Filament's own methods such as `url()`, `uuid()` or `hexColor()`.
+Every macro is named after its rule class (`ValidPhoneNumber` → `validPhoneNumber()`). The `valid` prefix keeps them from clashing with Filament's own methods such as `url()`, `uuid()` or `hexColor()`. Because the macros live on the base `Field` class, they chain with any field type (`TextInput`, `Textarea`, `Select`, `DatePicker`, ...) and compose freely with Filament's own methods.
+
+### A complete form
+
+A typical Filament resource form using several macros side by side with native Filament rules:
+
+```php
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Milwad\LaravelValidate\Utils\Country;
+
+public function form(Form $form): Form
+{
+    return $form->schema([
+        TextInput::make('username')
+            ->required()
+            ->validUsername(),
+
+        TextInput::make('phone')
+            ->required()
+            ->validPhoneNumber(Country::IRAN),
+
+        TextInput::make('iban')
+            ->validIban([Country::IRAN, Country::GERMANY]),
+
+        TextInput::make('password')
+            ->password()
+            ->validStrongPassword(),
+
+        TextInput::make('website')
+            ->validUrl(),
+
+        TextInput::make('slug')
+            ->validSlug(),
+    ]);
+}
+```
 
 ### Conditional rules
 
@@ -71,6 +138,21 @@ Select::make('country')
 TextInput::make('phone')
     ->validPhoneNumber(fn (Get $get) => $get('country')),
 ```
+
+### Custom error messages
+
+Error messages come from the `milwad/laravel-validate` rule classes. To change the wording, publish that package's language file and edit the relevant key (see [Validation messages](#validation-messages)):
+
+```bash
+php artisan vendor:publish --tag="validate-lang-en"
+```
+
+```php
+// lang/vendor/validate/en/validate.php
+'hex-color' => 'The :attribute must be a valid hex color (e.g. #fcba03).',
+```
+
+Edits there apply everywhere the rule is used, in Filament forms and in ordinary Laravel validation alike.
 
 ## Available macros
 
@@ -122,6 +204,18 @@ TextInput::make('phone')
 | `validVatId()`                 |                                        | `ValidVatId`                 |
 
 Every macro also takes `bool|Closure $condition = true` as its last argument. Country codes are available as constants on `Milwad\LaravelValidate\Utils\Country`. For details on each rule, see the [laravel-validate docs](https://github.com/milwad-dev/laravel-validate).
+
+## How it works
+
+On boot, the package's service provider calls `FieldMacros::register()`, which loops over every `laravel-validate` rule and registers a [macro](https://laravel.com/docs/packages#macros) on `Filament\Forms\Components\Field`. Each macro simply forwards to Filament's `rule()` method with a fresh rule instance, so there is no runtime overhead beyond the rules you actually use, and nothing to configure. Rules that take constructor arguments (`validIban`, `validPhoneNumber`, ...) accept those arguments — and closures in their place — and resolve them with Filament's `evaluate()` at validation time.
+
+## Troubleshooting
+
+**A macro method is not found (`Method ... does not exist`).** Make sure the package is installed and its service provider is discovered (`composer require milwad/laravel-validate-filament`, then `php artisan package:discover` if you have disabled auto-discovery). The macros are only registered once the service provider boots.
+
+**The error message shows a raw key like `validate.hex-color`.** Publish the `milwad/laravel-validate` language file for your locale — see [Validation messages](#validation-messages) — or override it per field with [`validationMessages()`](#custom-error-messages).
+
+**Validation does not run on an empty field.** Like Laravel's own rules, these run only when a value is present. Chain `->required()` when the field must not be empty.
 
 ## Roadmap
 
