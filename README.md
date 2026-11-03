@@ -49,6 +49,10 @@ TextInput::make('phone')->validPhoneNumber(Country::IRAN),
 - [Troubleshooting](#troubleshooting)
 - [Roadmap](#roadmap)
 - [Testing](#testing)
+- [Contributing](#contributing)
+- [Security](#security)
+- [Credits](#credits)
+- [Changelog](#changelog)
 - [License](#license)
 
 ## Requirements
@@ -213,7 +217,7 @@ On boot, the package's service provider calls `FieldMacros::register()`, which l
 
 **A macro method is not found (`Method ... does not exist`).** Make sure the package is installed and its service provider is discovered (`composer require milwad/laravel-validate-filament`, then `php artisan package:discover` if you have disabled auto-discovery). The macros are only registered once the service provider boots.
 
-**The error message shows a raw key like `validate.hex-color`.** Publish the `milwad/laravel-validate` language file for your locale — see [Validation messages](#validation-messages) — or override it per field with [`validationMessages()`](#custom-error-messages).
+**The error message shows a raw key like `validate.hex-color`.** Publish the `milwad/laravel-validate` language file for your locale so the key resolves to real text — see [Validation messages](#validation-messages) and [Custom error messages](#custom-error-messages). The wording lives in the rule's translation file, not in Filament's per-field `validationMessages()`, so edit it there.
 
 **Validation does not run on an empty field.** Like Laravel's own rules, these run only when a value is present. Chain `->required()` when the field must not be empty.
 
@@ -232,6 +236,39 @@ v1 ships field macros only. Planned for next versions:
 ```bash
 composer test
 ```
+
+The suite runs against the Laravel and Filament versions listed in [Requirements](#requirements) via [Orchestra Testbench](https://github.com/orchestral/testbench). If you are contributing a change, install dev dependencies first:
+
+```bash
+composer install
+composer test
+```
+
+## Contributing
+
+Contributions are welcome. A good change is small, focused, and comes with a test.
+
+1. Fork the repository and create a branch off `1.x`.
+2. Run `composer install`.
+3. Make your change. New or changed behaviour needs a passing test under `tests/`.
+4. Run `composer test` and make sure the suite is green.
+5. Open a pull request describing what changed and why.
+
+If you are adding support for a new `milwad/laravel-validate` rule, register its macro in [`src/FieldMacros.php`](src/FieldMacros.php) — a no-argument rule goes in the `SIMPLE_RULES` list, a rule with constructor arguments gets its own `Field::macro()` in `registerRulesWithArguments()` — and add a row to the [Available macros](#available-macros) table.
+
+## Security
+
+If you discover a security vulnerability, please do **not** open a public issue. Email the author at [milwad.dev@gmail.com](mailto:milwad.dev@gmail.com) instead. All reports will be reviewed and addressed promptly.
+
+## Credits
+
+- [Milwad Khosravi](https://github.com/milwad-dev) — author
+- [milwad/laravel-validate](https://github.com/milwad-dev/laravel-validate) — the validation rules this package exposes
+- [All contributors](https://github.com/milwad-dev/laravel-validate-filament/graphs/contributors)
+
+## Changelog
+
+See the [Releases page](https://github.com/milwad-dev/laravel-validate-filament/releases) for the list of changes in each version.
 
 ## License
 
