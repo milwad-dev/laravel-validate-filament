@@ -14,19 +14,30 @@ use ReflectionUnionType;
 class IdeHelperGenerator
 {
     /**
-     * Build the contents of an IDE helper file describing every macro as a `@method` annotation on Field.
+     * Descriptions shown next to the display macros.
+     *
+     * @var array<string, string>
+     */
+    protected const DISPLAY_DESCRIPTIONS = [
+        'masked' => 'Mask the displayed state, keeping the first $start and last $end characters.',
+        'maskedCardNumber' => 'Mask the displayed card number, keeping the last four digits.',
+        'maskedIban' => 'Mask the displayed IBAN, keeping the first and last four characters.',
+    ];
+
+    /**
+     * Build the contents of an IDE helper file describing every macro as a `@method` annotation.
      */
     public function generate(): string
     {
-        $methods = [];
+        $blocks = [$this->classBlock(Field::class, (new FieldMacros)->macros(), fn (string $name) => 'Validate with \\Milwad\\LaravelValidate\\Rules\\'.ucfirst($name).'.')];
 
-        foreach ((new FieldMacros)->macros() as $name => $macro) {
-            $methods[] = '     * '.$this->methodAnnotation($name, $macro);
+        $display = new DisplayMacros;
+
+        foreach ($display->components() as $component) {
+            $blocks[] = $this->classBlock($component, $display->macros(), fn (string $name) => self::DISPLAY_DESCRIPTIONS[$name] ?? '');
         }
 
-        $field = '\\'.Field::class;
-        $parent = ($parent = get_parent_class(Field::class)) ? ' extends \\'.$parent : '';
-        $methods = implode("\n", $methods);
+        $blocks = implode("\n", $blocks);
 
         return <<<PHP
 <?php
@@ -46,13 +57,38 @@ namespace {
     exit('This file should not be included, only analyzed by your IDE.');
 }
 
-namespace Filament\Forms\Components {
+{$blocks}
+PHP;
+    }
+
+    /**
+     * Build a namespace block redeclaring the class with a `@method` line for each macro.
+     *
+     * @param  class-string  $class
+     * @param  array<string, Closure>  $macros
+     * @param  Closure(string): string  $describe
+     */
+    protected function classBlock(string $class, array $macros, Closure $describe): string
+    {
+        $methods = [];
+
+        foreach ($macros as $name => $macro) {
+            $methods[] = '     * '.rtrim($this->methodAnnotation($name, $macro).' '.$describe($name));
+        }
+
+        $methods = implode("\n", $methods);
+        $namespace = substr($class, 0, strrpos($class, '\\'));
+        $shortName = class_basename($class);
+        $parent = ($parent = get_parent_class($class)) ? ' extends \\'.$parent : '';
+
+        return <<<PHP
+namespace {$namespace} {
     /**
 {$methods}
      *
-     * @see {$field}
+     * @see \\{$class}
      */
-    class Field{$parent} {}
+    class {$shortName}{$parent} {}
 }
 
 PHP;
@@ -68,9 +104,7 @@ PHP;
             (new ReflectionFunction($macro))->getParameters(),
         );
 
-        $rule = '\\Milwad\\LaravelValidate\\Rules\\'.ucfirst($name);
-
-        return sprintf('@method $this %s(%s) Validate with %s.', $name, implode(', ', $parameters), $rule);
+        return sprintf('@method $this %s(%s)', $name, implode(', ', $parameters));
     }
 
     /**

@@ -32,8 +32,14 @@
         "milwad/laravel-validate": "^2.2"
     },
     "require-dev": {
+        "filament/infolists": "^3.0|^4.0|^5.0",
+        "filament/tables": "^3.0|^4.0|^5.0",
         "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
         "pestphp/pest": "^2.0|^3.0|^4.0"
+    },
+    "suggest": {
+        "filament/infolists": "Adds the masked(), maskedIban() and maskedCardNumber() macros to infolist text entries.",
+        "filament/tables": "Adds the masked(), maskedIban() and maskedCardNumber() macros to table text columns."
     },
     "autoload": {
         "psr-4": {

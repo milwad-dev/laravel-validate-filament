@@ -44,6 +44,7 @@ TextInput::make('phone')->validPhoneNumber(Country::IRAN),
   - [Conditional rules](#conditional-rules)
   - [Dynamic arguments](#dynamic-arguments)
   - [Custom error messages](#custom-error-messages)
+  - [Masked display in tables and infolists](#masked-display-in-tables-and-infolists)
   - [IDE autocompletion](#ide-autocompletion)
 - [Available macros](#available-macros)
 - [How it works](#how-it-works)
@@ -159,6 +160,36 @@ php artisan vendor:publish --tag="validate-lang-en"
 
 Edits there apply everywhere the rule is used, in Filament forms and in ordinary Laravel validation alike.
 
+### Masked display in tables and infolists
+
+To show sensitive values without revealing them in full, the package also adds three display macros to `TextColumn` (tables) and `TextEntry` (infolists). They are registered only when `filament/tables` or `filament/infolists` is installed.
+
+```php
+use Filament\Infolists\Components\TextEntry;
+use Filament\Tables\Columns\TextColumn;
+
+TextColumn::make('iban')->maskedIban();               // IR06 **** **** **** **** **00 01
+TextColumn::make('card_number')->maskedCardNumber();  // **** **** **** 1111
+TextEntry::make('national_card')->masked(end: 4);     // ******6437
+TextEntry::make('phone')->masked(start: 4, end: 2);   // 0912*****89
+```
+
+| Macro                | Arguments                                                                   | Shows                                                          |
+|----------------------|-----------------------------------------------------------------------------|----------------------------------------------------------------|
+| `maskedIban()`       | —                                                                           | Country code, check digits and last 4 characters, in groups of 4 |
+| `maskedCardNumber()` | —                                                                           | Last 4 digits, in groups of 4                                  |
+| `masked()`           | `int $start = 0`, `int $end = 4`, `string $character = '*'`                | The first `$start` and last `$end` characters                  |
+
+Like the field macros, each one takes `bool|Closure $condition = true` as its last argument, so you can show the full value to some users only:
+
+```php
+TextColumn::make('iban')->maskedIban(fn () => ! auth()->user()->can('view-full-iban'));
+```
+
+Every argument can be a closure. Spaces and dashes in IBANs and card numbers are ignored, and a value too short to hide anything is masked entirely. Each macro sets the component's `formatStateUsing()`, so it replaces any formatter set earlier in the chain (and a later `formatStateUsing()` replaces the mask).
+
+Masking only changes what is displayed. It is not access control: the full value is still in your database, and features such as `copyable()`, search or exports may use the raw value. Hide or restrict those where it matters.
+
 ### IDE autocompletion
 
 Macros are added at runtime, so your IDE can't see them on its own. Generate a helper file with a `@method` annotation for every macro:
@@ -167,7 +198,7 @@ Macros are added at runtime, so your IDE can't see them on its own. Generate a h
 php artisan laravel-validate-filament:ide-helper
 ```
 
-This writes `_ide_helper_laravel_validate_filament.php` to your project root. PhpStorm, VS Code (Intelephense), PHPStan and Psalm pick it up automatically, so `TextInput::make('iban')->validIban(...)` autocompletes with its arguments. Pass a filename to put it somewhere else (`php artisan laravel-validate-filament:ide-helper .ide/filament-validate.php`), re-run it after upgrading the package, and add the file to `.gitignore` if you'd rather not commit it.
+This writes `_ide_helper_laravel_validate_filament.php` to your project root. PhpStorm, VS Code (Intelephense), PHPStan and Psalm pick it up automatically, so `TextInput::make('iban')->validIban(...)` and `TextColumn::make('iban')->maskedIban()` autocomplete with their arguments. Pass a filename to put it somewhere else (`php artisan laravel-validate-filament:ide-helper .ide/filament-validate.php`), re-run it after upgrading the package, and add the file to `.gitignore` if you'd rather not commit it.
 
 ## Available macros
 
@@ -224,6 +255,8 @@ Every macro also takes `bool|Closure $condition = true` as its last argument. Co
 
 On boot, the package's service provider calls `FieldMacros::register()`, which loops over every `laravel-validate` rule and registers a [macro](https://laravel.com/docs/packages#macros) on `Filament\Forms\Components\Field`. Each macro simply forwards to Filament's `rule()` method with a fresh rule instance, so there is no runtime overhead beyond the rules you actually use, and nothing to configure. Rules that take constructor arguments (`validIban`, `validPhoneNumber`, ...) accept those arguments — and closures in their place — and resolve them with Filament's `evaluate()` at validation time.
 
+`DisplayMacros::register()` does the same for `Filament\Tables\Columns\TextColumn` and `Filament\Infolists\Components\TextEntry`, skipping either one if its package isn't installed. Each display macro sets a `formatStateUsing()` callback that runs the value through `Milwad\LaravelValidateFilament\Mask`, which you can also call directly (`Mask::iban($value)`, `Mask::cardNumber($value)`, `Mask::middle($value, 0, 4)`).
+
 ## Troubleshooting
 
 **A macro method is not found (`Method ... does not exist`).** Make sure the package is installed and its service provider is discovered (`composer require milwad/laravel-validate-filament`, then `php artisan package:discover` if you have disabled auto-discovery). The macros are only registered once the service provider boots.
@@ -234,12 +267,12 @@ On boot, the package's service provider calls `FieldMacros::register()`, which l
 
 ## Roadmap
 
-v1 ships field macros and an IDE helper. Planned for next versions:
+v1 ships field macros, masked display macros and an IDE helper. Planned for next versions:
 
 - [ ] Ready-made field components for the most common rules, e.g. `PhoneNumberInput::make('phone')`, `IbanInput::make('iban')`, `NationalCardInput::make('national_card')`, `StrongPasswordInput::make('password')`, each with the rule applied plus sensible defaults (mask, placeholder, prefix icon, input mode).
 - [ ] Translated error messages out of the box, without having to publish the `milwad/laravel-validate` language files.
 - [x] IDE autocompletion for the macros — see [IDE autocompletion](#ide-autocompletion).
-- [ ] Optional table column / infolist helpers (e.g. masked IBAN / card number display).
+- [x] Table column / infolist helpers for masked display — see [Masked display in tables and infolists](#masked-display-in-tables-and-infolists).
 - [ ] Keep the macro list in sync when `milwad/laravel-validate` adds new rules.
 
 ## Testing

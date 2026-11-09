@@ -1,6 +1,8 @@
 <?php
 
 use Filament\Forms\Components\Field;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Tables\Columns\TextColumn;
 use Milwad\LaravelValidateFilament\FieldMacros;
 use Milwad\LaravelValidateFilament\IdeHelperGenerator;
 
@@ -59,4 +61,16 @@ it('accepts a custom filename', function () {
     $this->artisan('laravel-validate-filament:ide-helper', ['filename' => 'custom_helper.php'])->assertSuccessful();
 
     expect(base_path('custom_helper.php'))->toBeFile();
+});
+
+it('annotates the display macros on table columns and infolist entries', function () {
+    $helper = (new IdeHelperGenerator)->generate();
+
+    expect($helper)
+        ->toContain("namespace Filament\\Tables\\Columns {")
+        ->toContain('class TextColumn extends \\'.get_parent_class(TextColumn::class).' {}')
+        ->toContain("namespace Filament\\Infolists\\Components {")
+        ->toContain('class TextEntry extends \\'.get_parent_class(TextEntry::class).' {}')
+        ->toContain('@method $this maskedIban(\Closure|bool $condition = true) Mask the displayed IBAN')
+        ->toContain('@method $this masked(\Closure|int $start = 0, \Closure|int $end = 4, \Closure|string $character = \'*\', \Closure|bool $condition = true)');
 });

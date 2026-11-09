@@ -12,6 +12,7 @@ class LaravelValidateFilamentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         (new FieldMacros)->register();
+        (new DisplayMacros)->register();
 
         if ($this->app->runningInConsole()) {
             $this->commands([
