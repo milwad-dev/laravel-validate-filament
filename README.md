@@ -44,6 +44,7 @@ TextInput::make('phone')->validPhoneNumber(Country::IRAN),
   - [Conditional rules](#conditional-rules)
   - [Dynamic arguments](#dynamic-arguments)
   - [Custom error messages](#custom-error-messages)
+  - [IDE autocompletion](#ide-autocompletion)
 - [Available macros](#available-macros)
 - [How it works](#how-it-works)
 - [Troubleshooting](#troubleshooting)
@@ -158,6 +159,16 @@ php artisan vendor:publish --tag="validate-lang-en"
 
 Edits there apply everywhere the rule is used, in Filament forms and in ordinary Laravel validation alike.
 
+### IDE autocompletion
+
+Macros are added at runtime, so your IDE can't see them on its own. Generate a helper file with a `@method` annotation for every macro:
+
+```bash
+php artisan laravel-validate-filament:ide-helper
+```
+
+This writes `_ide_helper_laravel_validate_filament.php` to your project root. PhpStorm, VS Code (Intelephense), PHPStan and Psalm pick it up automatically, so `TextInput::make('iban')->validIban(...)` autocompletes with its arguments. Pass a filename to put it somewhere else (`php artisan laravel-validate-filament:ide-helper .ide/filament-validate.php`), re-run it after upgrading the package, and add the file to `.gitignore` if you'd rather not commit it.
+
 ## Available macros
 
 | Macro                          | Arguments                              | Rule                         |
@@ -223,11 +234,11 @@ On boot, the package's service provider calls `FieldMacros::register()`, which l
 
 ## Roadmap
 
-v1 ships field macros only. Planned for next versions:
+v1 ships field macros and an IDE helper. Planned for next versions:
 
 - [ ] Ready-made field components for the most common rules, e.g. `PhoneNumberInput::make('phone')`, `IbanInput::make('iban')`, `NationalCardInput::make('national_card')`, `StrongPasswordInput::make('password')`, each with the rule applied plus sensible defaults (mask, placeholder, prefix icon, input mode).
 - [ ] Translated error messages out of the box, without having to publish the `milwad/laravel-validate` language files.
-- [ ] IDE autocompletion for the macros (stub file with `@method` annotations, or a `php artisan laravel-validate-filament:ide-helper` command).
+- [x] IDE autocompletion for the macros — see [IDE autocompletion](#ide-autocompletion).
 - [ ] Optional table column / infolist helpers (e.g. masked IBAN / card number display).
 - [ ] Keep the macro list in sync when `milwad/laravel-validate` adds new rules.
 
@@ -254,7 +265,7 @@ Contributions are welcome. A good change is small, focused, and comes with a tes
 4. Run `composer test` and make sure the suite is green.
 5. Open a pull request describing what changed and why.
 
-If you are adding support for a new `milwad/laravel-validate` rule, register its macro in [`src/FieldMacros.php`](src/FieldMacros.php) — a no-argument rule goes in the `SIMPLE_RULES` list, a rule with constructor arguments gets its own `Field::macro()` in `registerRulesWithArguments()` — and add a row to the [Available macros](#available-macros) table.
+If you are adding support for a new `milwad/laravel-validate` rule, register its macro in [`src/FieldMacros.php`](src/FieldMacros.php) — a no-argument rule goes in the `SIMPLE_RULES` list, a rule with constructor arguments gets its own entry in `rulesWithArguments()` — and add a row to the [Available macros](#available-macros) table.
 
 ## Security
 

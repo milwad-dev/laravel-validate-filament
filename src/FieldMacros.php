@@ -61,48 +61,66 @@ class FieldMacros
      */
     public function register(): void
     {
-        foreach (self::SIMPLE_RULES as $rule) {
-            Field::macro(lcfirst(class_basename($rule)), function (bool|Closure $condition = true) use ($rule) {
-                return $this->rule(new $rule, $condition);
-            });
+        foreach ($this->macros() as $name => $macro) {
+            Field::macro($name, $macro);
         }
-
-        $this->registerRulesWithArguments();
     }
 
     /**
-     * Register macros for rules that accept constructor arguments.
+     * Every macro this package provides, keyed by method name.
+     *
+     * @return array<string, Closure>
+     */
+    public function macros(): array
+    {
+        $macros = [];
+
+        foreach (self::SIMPLE_RULES as $rule) {
+            $macros[lcfirst(class_basename($rule))] = function (bool|Closure $condition = true) use ($rule) {
+                return $this->rule(new $rule, $condition);
+            };
+        }
+
+        return array_merge($macros, $this->rulesWithArguments());
+    }
+
+    /**
+     * Macros for rules that accept constructor arguments.
      *
      * Each argument may also be a closure, evaluated by Filament at validation time.
+     *
+     * @return array<string, Closure>
      */
-    protected function registerRulesWithArguments(): void
+    protected function rulesWithArguments(): array
     {
-        Field::macro('validCountry', function (bool|Closure $validByKey = false, bool|Closure $condition = true) {
-            return $this->rule(fn () => new Rules\ValidCountry($this->evaluate($validByKey)), $condition);
-        });
+        return [
+            'validCountry' => function (bool|Closure $validByKey = false, bool|Closure $condition = true) {
+                return $this->rule(fn () => new Rules\ValidCountry($this->evaluate($validByKey)), $condition);
+            },
 
-        Field::macro('validIban', function (array|string|Closure $countries = [], bool|Closure $condition = true) {
-            return $this->rule(fn () => new Rules\ValidIban((array) $this->evaluate($countries)), $condition);
-        });
+            'validIban' => function (array|string|Closure $countries = [], bool|Closure $condition = true) {
+                return $this->rule(fn () => new Rules\ValidIban((array) $this->evaluate($countries)), $condition);
+            },
 
-        Field::macro('validJalaliDate', function (string|Closure $character = '/', bool|Closure $condition = true) {
-            return $this->rule(fn () => new Rules\ValidJalaliDate($this->evaluate($character)), $condition);
-        });
+            'validJalaliDate' => function (string|Closure $character = '/', bool|Closure $condition = true) {
+                return $this->rule(fn () => new Rules\ValidJalaliDate($this->evaluate($character)), $condition);
+            },
 
-        Field::macro('validLandlineNumber', function (string|Closure|null $code = null, bool|Closure $condition = true) {
-            return $this->rule(fn () => new Rules\ValidLandlineNumber($this->evaluate($code)), $condition);
-        });
+            'validLandlineNumber' => function (string|Closure|null $code = null, bool|Closure $condition = true) {
+                return $this->rule(fn () => new Rules\ValidLandlineNumber($this->evaluate($code)), $condition);
+            },
 
-        Field::macro('validNoHtml', function (bool|Closure $strict = false, bool|Closure $condition = true) {
-            return $this->rule(fn () => new Rules\ValidNoHtml($this->evaluate($strict)), $condition);
-        });
+            'validNoHtml' => function (bool|Closure $strict = false, bool|Closure $condition = true) {
+                return $this->rule(fn () => new Rules\ValidNoHtml($this->evaluate($strict)), $condition);
+            },
 
-        Field::macro('validPattern', function (int|Closure $length, string|Closure $separator = '-', bool|Closure $condition = true) {
-            return $this->rule(fn () => new Rules\ValidPattern($this->evaluate($length), $this->evaluate($separator)), $condition);
-        });
+            'validPattern' => function (int|Closure $length, string|Closure $separator = '-', bool|Closure $condition = true) {
+                return $this->rule(fn () => new Rules\ValidPattern($this->evaluate($length), $this->evaluate($separator)), $condition);
+            },
 
-        Field::macro('validPhoneNumber', function (string|Closure|null $code = null, bool|Closure $condition = true) {
-            return $this->rule(fn () => new Rules\ValidPhoneNumber($this->evaluate($code)), $condition);
-        });
+            'validPhoneNumber' => function (string|Closure|null $code = null, bool|Closure $condition = true) {
+                return $this->rule(fn () => new Rules\ValidPhoneNumber($this->evaluate($code)), $condition);
+            },
+        ];
     }
 }
