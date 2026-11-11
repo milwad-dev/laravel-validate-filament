@@ -251,13 +251,15 @@ This writes `_ide_helper_laravel_validate_filament.php` to your project root. Ph
 | `validUuid()`                  |                                        | `ValidUuid`                  |
 | `validVatId()`                 |                                        | `ValidVatId`                 |
 
-Every macro also takes `bool|Closure $condition = true` as its last argument. Country codes are available as constants on `Milwad\LaravelValidate\Utils\Country`. For details on each rule, see the [laravel-validate docs](https://github.com/milwad-dev/laravel-validate).
+Every macro also takes `bool|Closure $condition = true` as its last argument. If a newer `milwad/laravel-validate` release adds a rule that needs no arguments, it gets a macro automatically (named the same way) before it appears in this table; rules that need arguments get theirs in a release of this package. Country codes are available as constants on `Milwad\LaravelValidate\Utils\Country`. For details on each rule, see the [laravel-validate docs](https://github.com/milwad-dev/laravel-validate).
 
 ## How it works
 
 On boot, the package's service provider calls `FieldMacros::register()`, which loops over every `laravel-validate` rule and registers a [macro](https://laravel.com/docs/packages#macros) on `Filament\Forms\Components\Field`. Each macro simply forwards to Filament's `rule()` method with a fresh rule instance, so there is no runtime overhead beyond the rules you actually use, and nothing to configure. Rules that take constructor arguments (`validIban`, `validPhoneNumber`, ...) accept those arguments — and closures in their place — and resolve them with Filament's `evaluate()` at validation time.
 
 `DisplayMacros::register()` does the same for `Filament\Tables\Columns\TextColumn` and `Filament\Infolists\Components\TextEntry`, skipping either one if its package isn't installed. Each display macro sets a `formatStateUsing()` callback that runs the value through `Milwad\LaravelValidateFilament\Mask`, which you can also call directly (`Mask::iban($value)`, `Mask::cardNumber($value)`, `Mask::middle($value, 0, 4)`).
+
+Besides the rules it lists by hand, `FieldMacros` scans the `milwad/laravel-validate` rules directory on boot. Any rule with no macro yet that can be built without arguments is registered the same way as the listed ones. Only unknown files are loaded, so when every rule is covered this costs a single directory listing.
 
 The `laravel-validate` rules translate un-namespaced keys such as `validate.hex-color`, which Laravel only looks up in your app's `lang` directory. So the service provider wraps Laravel's translation loader (`translation.loader`) in `ValidateTranslationLoader`: for the `validate` group it loads the bundled file for the locale first, then lays your published file on top. Every other translation group goes straight to Laravel's own loader.
 
@@ -277,7 +279,7 @@ v1 ships field macros, masked display macros, bundled translations and an IDE he
 - [x] Translated error messages out of the box, without publishing the `milwad/laravel-validate` language files — see [Validation messages](#validation-messages).
 - [x] IDE autocompletion for the macros — see [IDE autocompletion](#ide-autocompletion).
 - [x] Table column / infolist helpers for masked display — see [Masked display in tables and infolists](#masked-display-in-tables-and-infolists).
-- [ ] Keep the macro list in sync when `milwad/laravel-validate` adds new rules.
+- [x] Keep the macro list in sync when `milwad/laravel-validate` adds new rules — new rules without arguments are picked up automatically, and a weekly CI run flags the rest.
 
 ## Testing
 
@@ -302,7 +304,7 @@ Contributions are welcome. A good change is small, focused, and comes with a tes
 4. Run `composer test` and make sure the suite is green.
 5. Open a pull request describing what changed and why.
 
-If you are adding support for a new `milwad/laravel-validate` rule, register its macro in [`src/FieldMacros.php`](src/FieldMacros.php) — a no-argument rule goes in the `SIMPLE_RULES` list, a rule with constructor arguments gets its own entry in `rulesWithArguments()` — and add a row to the [Available macros](#available-macros) table.
+If you are adding support for a new `milwad/laravel-validate` rule, register its macro in [`src/FieldMacros.php`](src/FieldMacros.php) — a no-argument rule goes in the `SIMPLE_RULES` list, a rule with constructor arguments gets its own entry in `rulesWithArguments()` — and add a row to the [Available macros](#available-macros) table. The test suite (also run weekly in CI against the latest `milwad/laravel-validate`) fails with the names of any upstream rules that are missing from these lists.
 
 ## Security
 

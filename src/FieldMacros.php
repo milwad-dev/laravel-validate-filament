@@ -4,7 +4,12 @@ namespace Milwad\LaravelValidateFilament;
 
 use Closure;
 use Filament\Forms\Components\Field;
+use Illuminate\Contracts\Validation\InvokableRule;
+use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Milwad\LaravelValidate\LaravelValidateServiceProvider;
 use Milwad\LaravelValidate\Rules;
+use ReflectionClass;
 
 class FieldMacros
 {
@@ -69,19 +74,96 @@ class FieldMacros
     /**
      * Every macro this package provides, keyed by method name.
      *
+     * Rules added to milwad/laravel-validate after this release get a macro too, as long as they need no
+     * constructor arguments. Rules that need arguments are skipped until they get a hand-written macro.
+     *
      * @return array<string, Closure>
      */
     public function macros(): array
     {
+        $macros = $this->explicitMacros();
+
+        foreach ($this->discoverRules($this->rulesDirectory(), 'Milwad\\LaravelValidate\\Rules', array_keys($macros)) as $rule) {
+            $macros[lcfirst(class_basename($rule))] = $this->simpleMacro($rule);
+        }
+
+        return $macros;
+    }
+
+    /**
+     * The macros listed by hand in this class, without discovered rules.
+     *
+     * @return array<string, Closure>
+     */
+    public function explicitMacros(): array
+    {
         $macros = [];
 
         foreach (self::SIMPLE_RULES as $rule) {
-            $macros[lcfirst(class_basename($rule))] = function (bool|Closure $condition = true) use ($rule) {
-                return $this->rule(new $rule, $condition);
-            };
+            $macros[lcfirst(class_basename($rule))] = $this->simpleMacro($rule);
         }
 
         return array_merge($macros, $this->rulesWithArguments());
+    }
+
+    /**
+     * The directory holding the milwad/laravel-validate rule classes.
+     */
+    public function rulesDirectory(): string
+    {
+        return dirname((new ReflectionClass(LaravelValidateServiceProvider::class))->getFileName()).'/Rules';
+    }
+
+    /**
+     * Find rule classes in a directory that have no macro yet and can be built without arguments.
+     *
+     * Only files whose macro name is unknown are loaded, so this costs a single directory listing
+     * when every rule is already covered.
+     *
+     * @param  array<int, string>  $known  Macro names that already exist.
+     * @return array<int, class-string>
+     */
+    public function discoverRules(string $directory, string $namespace, array $known = []): array
+    {
+        $known = array_flip($known);
+        $rules = [];
+
+        foreach (glob($directory.'/*.php') ?: [] as $file) {
+            $basename = basename($file, '.php');
+
+            if (isset($known[lcfirst($basename)])) {
+                continue;
+            }
+
+            $class = $namespace.'\\'.$basename;
+
+            if (! class_exists($class)) {
+                continue;
+            }
+
+            $reflection = new ReflectionClass($class);
+            $isRule = $reflection->implementsInterface(Rule::class)
+                || $reflection->implementsInterface(ValidationRule::class)
+                || (interface_exists(InvokableRule::class) && $reflection->implementsInterface(InvokableRule::class));
+
+            if ($isRule && $reflection->isInstantiable() && ($reflection->getConstructor()?->getNumberOfRequiredParameters() ?? 0) === 0) {
+                $rules[] = $class;
+            }
+        }
+
+        return $rules;
+    }
+
+    /**
+     * A macro that applies a rule built without arguments.
+     *
+     * @param  class-string  $rule
+     */
+    protected function simpleMacro(string $rule): Closure
+    {
+        return function (bool|Closure $condition = true) use ($rule) {
+            return $this->rule(new $rule, $condition);
+        };
     }
 
     /**

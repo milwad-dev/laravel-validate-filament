@@ -12,9 +12,10 @@ afterEach(function () {
 });
 
 it('lists every registered macro', function () {
-    $macros = array_keys((new FieldMacros)->macros());
+    $fieldMacros = new FieldMacros;
+    $macros = array_keys($fieldMacros->macros());
 
-    expect($macros)->toHaveCount(44);
+    expect($macros)->toHaveCount(count(glob($fieldMacros->rulesDirectory().'/*.php')));
 
     foreach ($macros as $macro) {
         expect(Field::hasMacro($macro))->toBeTrue("Macro [{$macro}] is not registered");

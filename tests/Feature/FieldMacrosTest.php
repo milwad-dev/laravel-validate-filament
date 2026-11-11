@@ -3,14 +3,44 @@
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\TextInput;
 use Milwad\LaravelValidate\Utils\Country;
+use Milwad\LaravelValidateFilament\FieldMacros;
+use Milwad\LaravelValidateFilament\Tests\Fixtures\Rules\ValidLuckyNumber;
 
 it('registers a macro for every laravel-validate rule', function () {
     $rules = collect(glob(dirname(__DIR__, 2).'/vendor/milwad/laravel-validate/src/Rules/*.php'))
         ->map(fn (string $path) => lcfirst(basename($path, '.php')));
 
-    expect($rules)->toHaveCount(44);
+    expect($rules)->not->toBeEmpty();
 
-    $rules->each(fn (string $macro) => expect(Field::hasMacro($macro))->toBeTrue("Missing macro [{$macro}]"));
+    // A new upstream rule that needs constructor arguments fails here until it gets a hand-written macro.
+    $rules->each(fn (string $macro) => expect(Field::hasMacro($macro))->toBeTrue("Missing macro [{$macro}]: add it to rulesWithArguments() in src/FieldMacros.php"));
+});
+
+it('discovers new rules that need no arguments', function () {
+    $rules = (new FieldMacros)->discoverRules(
+        dirname(__DIR__).'/Fixtures/Rules',
+        'Milwad\\LaravelValidateFilament\\Tests\\Fixtures\\Rules',
+    );
+
+    expect($rules)->toBe([ValidLuckyNumber::class]);
+});
+
+it('skips rules that already have a macro when discovering', function () {
+    $rules = (new FieldMacros)->discoverRules(
+        dirname(__DIR__).'/Fixtures/Rules',
+        'Milwad\\LaravelValidateFilament\\Tests\\Fixtures\\Rules',
+        ['validLuckyNumber'],
+    );
+
+    expect($rules)->toBe([]);
+});
+
+it('lists every rule of the installed laravel-validate release by hand', function () {
+    $macros = new FieldMacros;
+    $discovered = $macros->discoverRules($macros->rulesDirectory(), 'Milwad\\LaravelValidate\\Rules', array_keys($macros->explicitMacros()));
+
+    // Users already get these macros through discovery; this keeps SIMPLE_RULES and the README table complete.
+    expect($discovered)->toBe([], 'Add these new rules to SIMPLE_RULES in src/FieldMacros.php and to the README table: '.implode(', ', $discovered));
 });
 
 it('validates values with the macro', function (string $macro, array $arguments, mixed $valid, mixed $invalid) {
