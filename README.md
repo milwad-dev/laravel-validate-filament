@@ -75,13 +75,15 @@ The service provider is auto-discovered. It registers a macro for each rule on `
 
 ### Validation messages
 
-Error messages come from `milwad/laravel-validate`. Publish the language file for your locale, otherwise the raw translation key (for example `validate.hex-color`) is shown:
+Error messages come from `milwad/laravel-validate` and work out of the box, translated into your app's locale: the package serves that package's bundled language files directly, so there is nothing to publish. Locales without a bundled translation fall back to your app's `fallback_locale`. See the [supported languages](https://github.com/milwad-dev/laravel-validate#support-languages).
+
+To change the wording, publish the language file for your locale and edit it:
 
 ```bash
 php artisan vendor:publish --tag="validate-lang-en"
 ```
 
-Replace `en` with your language. See the [supported languages](https://github.com/milwad-dev/laravel-validate#support-languages).
+Replace `en` with your language. Published files take priority key by key, so you can delete every line you don't change and those keys keep the bundled text (and pick up upstream fixes).
 
 ## Usage
 
@@ -147,7 +149,7 @@ TextInput::make('phone')
 
 ### Custom error messages
 
-Error messages come from the `milwad/laravel-validate` rule classes. To change the wording, publish that package's language file and edit the relevant key (see [Validation messages](#validation-messages)):
+Error messages come from the `milwad/laravel-validate` rule classes. To change the wording, publish that package's language file and edit the relevant key; any key you leave out keeps the bundled text (see [Validation messages](#validation-messages)):
 
 ```bash
 php artisan vendor:publish --tag="validate-lang-en"
@@ -257,20 +259,22 @@ On boot, the package's service provider calls `FieldMacros::register()`, which l
 
 `DisplayMacros::register()` does the same for `Filament\Tables\Columns\TextColumn` and `Filament\Infolists\Components\TextEntry`, skipping either one if its package isn't installed. Each display macro sets a `formatStateUsing()` callback that runs the value through `Milwad\LaravelValidateFilament\Mask`, which you can also call directly (`Mask::iban($value)`, `Mask::cardNumber($value)`, `Mask::middle($value, 0, 4)`).
 
+The `laravel-validate` rules translate un-namespaced keys such as `validate.hex-color`, which Laravel only looks up in your app's `lang` directory. So the service provider wraps Laravel's translation loader (`translation.loader`) in `ValidateTranslationLoader`: for the `validate` group it loads the bundled file for the locale first, then lays your published file on top. Every other translation group goes straight to Laravel's own loader.
+
 ## Troubleshooting
 
 **A macro method is not found (`Method ... does not exist`).** Make sure the package is installed and its service provider is discovered (`composer require milwad/laravel-validate-filament`, then `php artisan package:discover` if you have disabled auto-discovery). The macros are only registered once the service provider boots.
 
-**The error message shows a raw key like `validate.hex-color`.** Publish the `milwad/laravel-validate` language file for your locale so the key resolves to real text — see [Validation messages](#validation-messages) and [Custom error messages](#custom-error-messages). The wording lives in the rule's translation file, not in Filament's per-field `validationMessages()`, so edit it there.
+**The error message shows a raw key like `validate.hex-color`.** The bundled messages are served automatically, so this means the key exists in neither your published `lang/{locale}/validate.php` nor the bundled English file — check for a typo in a key you added, or a `fallback_locale` that isn't a language listed above. See [Validation messages](#validation-messages) and [Custom error messages](#custom-error-messages). The wording lives in the rule's translation file, not in Filament's per-field `validationMessages()`, so edit it there.
 
 **Validation does not run on an empty field.** Like Laravel's own rules, these run only when a value is present. Chain `->required()` when the field must not be empty.
 
 ## Roadmap
 
-v1 ships field macros, masked display macros and an IDE helper. Planned for next versions:
+v1 ships field macros, masked display macros, bundled translations and an IDE helper. Planned for next versions:
 
 - [ ] Ready-made field components for the most common rules, e.g. `PhoneNumberInput::make('phone')`, `IbanInput::make('iban')`, `NationalCardInput::make('national_card')`, `StrongPasswordInput::make('password')`, each with the rule applied plus sensible defaults (mask, placeholder, prefix icon, input mode).
-- [ ] Translated error messages out of the box, without having to publish the `milwad/laravel-validate` language files.
+- [x] Translated error messages out of the box, without publishing the `milwad/laravel-validate` language files — see [Validation messages](#validation-messages).
 - [x] IDE autocompletion for the macros — see [IDE autocompletion](#ide-autocompletion).
 - [x] Table column / infolist helpers for masked display — see [Masked display in tables and infolists](#masked-display-in-tables-and-infolists).
 - [ ] Keep the macro list in sync when `milwad/laravel-validate` adds new rules.
